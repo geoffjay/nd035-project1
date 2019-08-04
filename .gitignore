@@ -1,0 +1,8 @@
+*~
+*.sw[op]
+
+*.class
+
+target/
+out/
+tmp/
