@@ -3,6 +3,8 @@
 
 *.class
 
+.idea/
+
 target/
 out/
 tmp/
