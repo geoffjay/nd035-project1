@@ -1,33 +1,34 @@
 package edu.udacity.java.nano.chat.internal;
 
+import com.google.gson.Gson;
 import edu.udacity.java.nano.chat.model.Message;
 
 import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
 import javax.websocket.EndpointConfig;
 
-// TODO: I think there should be individual encoder and decoder classes for all types
-
 public class MessageDecoder implements Decoder.Text<Message>{
 
+    private static Gson gson = new Gson();
+
     @Override
-    public Message decode(String text) throws DecodeException {
-        return new Message(text, Message.MessageType.CHAT);
+    public Message decode(String s) throws DecodeException {
+        Message message = gson.fromJson(s, Message.class);
+        return message;
     }
 
     @Override
-    public boolean willDecode(String string) {
-        return true;
+    public boolean willDecode(String s) {
+        return (s != null);
     }
 
     @Override
-    public void init(EndpointConfig ec) {
-        //no-op
+    public void init(EndpointConfig endpointConfig) {
+        // Custom initialization logic
     }
 
     @Override
     public void destroy() {
-        //no-op
+        // Close resources
     }
-
 }

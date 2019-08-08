@@ -9,12 +9,9 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * WebSocket Server
@@ -31,59 +28,49 @@ import java.util.logging.Logger;
 )
 public class WebSocketChatServer {
 
-    //private Session session;
-    //private static final Set<WebSocketChatServer> chatEndpoints = new CopyOnWriteArraySet<>();
-    /**
-     * All chat sessions.
-     */
-    private static Map<String, Session> onlineSessions = new ConcurrentHashMap<>();
-
-    /**
-     * Send a message to all sessions.
-     *
-     * @param msg The message to send
-     */
-    private static void sendMessageToAll(String msg) throws IOException, EncodeException {
-        for (Session session: onlineSessions.values()) {
-            System.out.println("publish message to " + session.getUserProperties().get("user"));
-            try {
-                session.getBasicRemote().sendObject(new Message(msg, Message.MessageType.CHAT));
-            } catch (IOException | EncodeException ex) {
-                Logger.getLogger(WebSocketChatServer.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
+    private Session session;
+    private static final Set<WebSocketChatServer> endpoints = new CopyOnWriteArraySet<>();
+    private static HashMap<String, String> users = new HashMap<>();
 
     /**
      * Open connection, 1) add session, 2) add user.
      */
     @OnOpen
-    public void onOpen(@PathParam("user") String user, Session session) {
-        session.getUserProperties().put("user", user);
-        onlineSessions.put(user, session);
-        System.out.println("added session for user " + user);
-        sendMessageToAll("[enter] " + user);
+    public void onOpen(Session session, @PathParam("user") String user) throws IOException, EncodeException {
+        this.session = session;
+        endpoints.add(this);
+        users.put(session.getId(), user);
+
+        Message message = new Message();
+        message.setSender(user);
+        message.setContent("Connected");
+        message.setType(Message.MessageType.ENTER);
+        message.setOnlineCount(endpoints.size());
+        sendMessageToAll(message);
     }
 
     /**
      * Send message, 1) get username and session, 2) send message to all.
      */
     @OnMessage
-    public void onMessage(Session session, String jsonStr) {
-        String user = (String) session.getUserProperties().get("user");
-        System.out.println("received message from user " + user);
-        sendMessageToAll("[chat] " + msg);
+    public void onMessage(Session session, Message message) throws IOException, EncodeException {
+        message.setSender(users.get(session.getId()));
+        message.setType(Message.MessageType.CHAT);
+        sendMessageToAll(message);
     }
 
     /**
      * Close connection, 1) remove session, 2) update user.
      */
     @OnClose
-    public void onClose(Session session) {
-        String user = (String) session.getUserProperties().get("user");
-        onlineSessions.remove(user);
-        System.out.println("removed session for user " + user);
-        sendMessageToAll("[leave] " + user);
+    public void onClose(Session session) throws IOException, EncodeException {
+        endpoints.remove(this);
+        Message message = new Message();
+        message.setSender(users.get(session.getId()));
+        message.setContent("Disconnected");
+        message.setType(Message.MessageType.LEAVE);
+        message.setOnlineCount(endpoints.size());
+        sendMessageToAll(message);
     }
 
     /**
@@ -92,5 +79,22 @@ public class WebSocketChatServer {
     @OnError
     public void onError(Session session, Throwable error) {
         error.printStackTrace();
+    }
+
+    /**
+     * Send a message to all sessions.
+     *
+     * @param message The message to broadcast
+     */
+    private static void sendMessageToAll(Message message) throws IOException, EncodeException {
+        endpoints.forEach(endpoint -> {
+            synchronized (endpoint) {
+                try {
+                    endpoint.session.getBasicRemote().sendObject(message);
+                } catch (IOException | EncodeException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

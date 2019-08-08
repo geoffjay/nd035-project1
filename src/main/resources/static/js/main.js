@@ -1,3 +1,20 @@
+'use strict';
+
+var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+};
+
 /**
  * WebSocket Client
  *
@@ -5,22 +22,25 @@
  * 2、WebSocket client send message to server. example：webSocket.send();
  */
 function getWebSocket() {
+    var username = getUrlParameter("username");
+    var host = document.location.host;
+
     /**
      * WebSocket client PS：URL shows WebSocket protocal, port number, and then end point.
      */
-    var webSocket = new WebSocket(/*[[${webSocketUrl}]]*/ 'ws://localhost:8080/chat');
+    var ws = new WebSocket("ws://" + host + "/chat/" + username);
 
     /**
      * websocket open connection.
      */
-    webSocket.onopen = function (event) {
+    ws.onopen = function (event) {
         console.log('WebSocket open connection');
     };
 
     /**
      * Server send 1) broadcast message, 2) online users.
      */
-    webSocket.onmessage = function (event) {
+    ws.onmessage = function (event) {
         console.log('WebSocket Receives：%c' + event.data, 'color:green');
         //Receive Message from Server
         var message = JSON.parse(event.data) || {};
@@ -29,7 +49,7 @@ function getWebSocket() {
             $messageContainer.append(
                 '<div class="mdui-card" style="margin: 10px 0;">' +
                 '<div class="mdui-card-primary">' +
-                '<div class="mdui-card-content message-content">' + message.username + "：" + message.msg + '</div>' +
+                '<div class="mdui-card-content message-content">' + message.sender + "：" + message.content + '</div>' +
                 '</div></div>');
         }
         $('.chat-num').text(message.onlineCount);
@@ -44,17 +64,18 @@ function getWebSocket() {
     /**
      * Close connection
      */
-    webSocket.onclose = function (event) {
+    ws.onclose = function (event) {
         console.log('WebSocket close connection.');
     };
 
     /**
      * Exception
      */
-    webSocket.onerror = function (event) {
+    ws.onerror = function (event) {
         console.log('WebSocket exception.');
     };
-    return webSocket;
+
+    return ws;
 }
 
 var webSocket = getWebSocket();
@@ -65,7 +86,10 @@ var webSocket = getWebSocket();
 function sendMsgToServer() {
     var $message = $('#msg');
     if ($message.val()) {
-        webSocket.send(JSON.stringify({username: $('#username').text(), msg: $message.val()}));
+        webSocket.send(JSON.stringify({
+            username: $('#username').text(),
+            content: $message.val()
+        }));
         $message.val(null);
     }
 }

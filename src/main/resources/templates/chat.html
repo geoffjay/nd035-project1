@@ -9,9 +9,12 @@
 </head>
 <body class="mdui-theme-primary-indigo mdui-theme-accent-pink">
 
-<div style="margin-left:20px;margin-right:20px">
+<div class="mdui-appbar">
     <div class="mdui-toolbar mdui-color-theme">
-        <span class="mdui-typo-title">Chat Room</span>
+        <span class="mdui-typo-title">
+            <i class="mdui-icon material-icons">chat_bubble_outline</i>
+            Chat Room
+        </span>
         <div class="mdui-toolbar-spacer"></div>
         <a class="mdui-btn mdui-btn-icon" th:href="@{/}">
             <i class="mdui-icon material-icons">exit_to_app</i>
@@ -19,7 +22,7 @@
     </div>
 </div>
 
-<div style="margin-left:20px;margin-right:20px">
+<div style="margin:20px">
     <div class="container-text">
         <div class="mdui-row">
             <div class="mdui-col-xs-12 mdui-col-sm-6">
@@ -36,9 +39,13 @@
                         <input class="mdui-textfield-input" id="msg"/>
                     </div>
                     <div class="mdui-container" style="padding:20px 35px">
-                        <!-- TODO: add a send button to send message -->
+                        <button class="mdui-btn mdui-color-theme-accent mdui-ripple"
+                                onclick="sendMsgToServer()">
+                            Send (Enter)
+                        </button>
                         <button class="mdui-btn mdui-color-theme mdui-ripple"
-                                onclick="clearMsg()">Clear
+                                onclick="clearMsg()">
+                            Clear
                         </button>
                     </div>
                 </div>
@@ -54,10 +61,12 @@
                 <div class="mdui-chip">
                     <span class="mdui-chip-icon mdui-color-blue">
                         <i class="mdui-icon material-icons">face</i></span>
-                    <span class="mdui-chip-title">Online Users</span>
-                    <!-- TODO: check online number num -->
+                    <span class="mdui-chip-title">
+                        Online Users
+                        <i class="mdui-chip-title chat-num"></i>
+                    </span>
                 </div>
-                <!-- TODO: add a message container -->
+                <div class="mdui-col-xs-12 mdui-col-sm-10 message-container"></div>
             </div>
 
         </div>

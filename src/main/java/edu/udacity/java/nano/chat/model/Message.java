@@ -7,6 +7,8 @@ public class Message {
     private MessageType type;
     private String content;
     private String sender;
+    private String recipient;
+    private Integer onlineCount;
 
     public enum MessageType {
         CHAT,
@@ -81,5 +83,42 @@ public class Message {
      */
     public void setSender(String sender) {
         this.sender = sender;
+    }
+
+    /**
+     * Property getter for recipient.
+     *
+     * @return The value of the `recipient' property.
+     */
+    public String getRecipient() {
+        return recipient;
+    }
+
+    /**
+     * Property setter for recipient.
+     *
+     * @param recipient Value to set the `recipient' property.
+     */
+    public void setRecipient(String recipient) {
+
+        this.recipient = recipient;
+    }
+
+    /**
+     * Property getter for user count.
+     *
+     * @return The value of the `onlineCount' property.
+     */
+    public Integer getOnlineCount() {
+        return onlineCount;
+    }
+
+    /**
+     * Property setter for user count.
+     *
+     * @param onlineCount Value to set the `onlineCount' property.
+     */
+    public void setOnlineCount(Integer onlineCount) {
+        this.onlineCount = onlineCount;
     }
 }
