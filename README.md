@@ -7,10 +7,19 @@ messages that are sent are broadcast to all users.
 
 ### Development
 
-During development the server can be built and run using the command: 
+During development the server can be built and run locally using the command:
 
 ```sh
 mvn spring-boot:run
+```
+
+### Docker
+
+The application can also be run in a container use Docker.
+
+```sh
+docker build -t chat-room .
+docker run -it --rm --name chatter chat-room
 ```
 
 ### Packaging
