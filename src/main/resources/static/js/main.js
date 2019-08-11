@@ -18,8 +18,8 @@ var getUrlParameter = function getUrlParameter(sParam) {
 /**
  * WebSocket Client
  *
- * 1、WebSocket client receive messages with callback. example：webSocket.onmessage
- * 2、WebSocket client send message to server. example：webSocket.send();
+ * 1. WebSocket client receive messages with callback. example：webSocket.onmessage
+ * 2. WebSocket client send message to server. example：webSocket.send();
  */
 function getWebSocket() {
     var username = getUrlParameter("username");
