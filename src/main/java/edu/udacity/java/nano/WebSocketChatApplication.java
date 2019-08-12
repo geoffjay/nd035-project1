@@ -1,6 +1,5 @@
 package edu.udacity.java.nano;
 
-import edu.udacity.java.nano.chat.model.User;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
